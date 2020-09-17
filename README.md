@@ -19,8 +19,17 @@
     找到最大值：
     ```cpp
     auto p=std::max_element(arr.begin(),arr.end());
+    return *p;
+    auto p = std::::min_element(s.begin(),s.end());
     ```
-    返回值p是迭代器
+    返回值p是迭代器,返回值需要加上*  
+      
+    ```cpp
+    sort(s.begin(),s.end(),less<int>());
+    sort(s.begin(),s.end(),greater<int>());
+    ```
+    注意end必须在你想呀排序的最后一个位置之后
+
 
 - 快排的基本格式
     ```cpp
@@ -51,7 +60,10 @@
 - deque双端队列  
     deque只在首位插入较快
 - vector  
-    在为vector初始化时最好先
+    在为vector初始化时最好先定好大小，避免扩容时候重复拷贝。  
+    使用vector初始化二维数组方法
+    ```cpp
+    vector<vector<int>> f(n + 1, vector<int>(26));
 - lambda表达式
     ```cpp
     []() {}
@@ -96,3 +108,52 @@
     派生类和基类智能指针之间的转换可以用`std::dynamic_pointer_cast` and `std::static_pointer_cast`  
     `const_cast` can change const pointer or refrence to nonconst  
     when complier not allow you use `static_cast`, but you can ensure this behaviour is safe,you can use `static_cast`
+
+- reverse()函数可以翻转容器  
+    `reverse(s.begin(),s.end())`
+- 指定小数输出精度  
+    `cout<<setprecision(3)<<fixed<<a/b<<endl;`或者C代码`printf("%.指定的位数lf\n",要输出的数);`  
+- functional  
+    std:function为一个多态函数包装器
+    在C语言中，使用函数指针可以让函数指针指向参数类型相同，返回值类型也相同的函数，通过函数指针实现多态  
+    `typedef int (*func)();`  
+    指向无参数输入，返回值为Int的函数.  
+    `std::function<void()> func(&print1);`  
+    `func=&print2`;  
+    `std::function<int(int)> f=target`  
+    store a lambda:  
+    `function<void()> f = [](){do_something;};`  
+    store bind result:  
+    `std::function<void()> f_display_31337 = std::bind(print_num, 31337);`  
+    
+    当func被赋予了一个重载了()的对象时，可以向调用该函数一样使用该对象
+    ```cpp
+    class a{
+        void operator()(){
+            ...
+        }
+    }
+    a A;
+    func=A;
+    func();<--can be used as a function
+    ```
+    实现function功能有两种方式，一种是通过类的多态即虚表来达到多态，一种是通过C语言的函数指针来实现。  
+- bind()函数适配器  
+    他接受一个函数，生成一个函数来改变原来函数的参数列表，比如减少原来函数的参数个数，或者顺序，以满足新的需求。
+    ```cpp
+    #include<functional>
+    using namespace std::placeholders;<--占位符
+    ```
+    `bind(函数名，arg_list);`arg_list为用逗号分割的原来函数的参数列表，里面可能包含占位符`_n`代表新的函数里的参数位置。`_1` 代表这个参数在原函数中为第一个参数。
+    ```cpp
+    double devide(double x, double y){
+        return x/y;
+    }
+    auto one_bind = std::bind(devide, 2, 10);<--- 0.5;
+    auto two_bind = std::bind(devide, _1, 2);<--- two_bind(10)  = 5
+    auto three_bind = std:bind(devide, _2, _1);<--- three(10,2) = 0.2
+    auto four_bind = std:bind<int>(devide, _1, _2);<--- 指定返回类型为Int four_bind(10, 3) = 0.3
+    ```
+    `bind(..., bind(...), ...)`bind 可以嵌套  
+- thread  
+    
