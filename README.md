@@ -14,7 +14,11 @@
     ```cpp
     myclass a={1,2,3,4};
     ```
-
+- A a;  
+    std::cout << typeid(a).name();  // 可以在编译时确定a的类型为A  
+    空对象占用一个字节，因为需要在内存中确定a的位置  
+    typeid(decltype(a_rb)).name(); // decltype产生的是编译时即可确定的声明类型，因此为A
+typeid(a_rb).name()；  // 由于a_rb是多态类型的glvalue，typeid在运行时计算，因此为B
 - algorithm头文件  
     找到最大值：
     ```cpp
@@ -155,5 +159,76 @@
     auto four_bind = std:bind<int>(devide, _1, _2);<--- 指定返回类型为Int four_bind(10, 3) = 0.3
     ```
     `bind(..., bind(...), ...)`bind 可以嵌套  
+- assert  
+assert(表达式)；如果表达式为假则打印错误信息并且退出
 - thread  
     
+- ifstream  
+ 用`ifstream input {name};`替换`FILE* input = fopen(name, "r");`
+- 静态断言  
+`static_assert` 用于在编译器检查，如果表达式为真，不作任何事情，如果为否，抛出编译错误就是提示字符串。常用与模板中
+`static_assert(常量表达式，提示字符串);`  
+- 枚举enum  
+枚举力的值必须要在编译器可知
+- 模板  
+模板实参不能腿短返回类型，必须显示指定  
+```cpp
+template <typename T, typename U, typename RT>
+RT max(T a, U b){
+    return a>b?a:b;
+}
+cout<<::max<int,double, double>(1,3.1);
+---默认情况下，返回参数由第一个模板参数确定
+template <typename T,typename U>
+T max(T a, U b){
+    return a>b?a:b;
+}
+cout<<::max(1,3.1);
+----
+template <typename RT, typename T, typename U>
+RT max(T a, U b) {
+  return b < a ? a : b;
+}
+
+::max<double>(1, 3.14);  // OK：返回类型为 double，返回 3.14
+//---C++14 can use atuto as return type
+template <typename T, typename U>
+auto max(T a, U b) {
+  return b < a ? a : b;
+}
+//if you only support C++11 you need to add ->
+template <typename T, typename U>
+auto max(T a, U b) -> decltype(b < a ? a : b) {
+  return b < a ? a : b;
+}
+```
+使用std::common_type获取模板参数类型都能隐式转换到的类型，在C++14中你可以这么写
+```cpp
+#include <type_traits>
+
+template <typename T, typename U, typename RT = std::common_type_t<T, U>>
+RT max(T a, U b) {
+  return b < a ? a : b;
+}
+```
+有时候你的模板参数必须是一个引用，但是你的返回值不能是一个引用，可以使用std::decay去掉引用修饰符等，退化到基本的类型。
+```cpp
+#include <type_traits>
+
+template<typename T, typename U, typename RT = std::decay_t<decltype(true ? T() : U())>>
+RT max(T a, U b) {
+  return b < a ? a : b;
+}
+```
+在模板中使用constexpr：  
+```cpp
+constexpr auto fact(uint64_t n){
+    if(n ==1 ){
+        return n;
+    }
+    return n*fact(n-1);
+}
+constexpr auto i = ::fact(10);
+```
+可以在编译器获得i的值，需要注意constexpr在递归很多层时可能失败。  
+如果类模板有static数据成员，每种实例化类型都会实例化static数据成员。static成员函数和数据成员只被同类型共享。
