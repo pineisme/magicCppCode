@@ -120,9 +120,125 @@ double除以-0.0 --> 负无穷
 0.0/0.0 --> NaN  
 当使用==时，NaN不等于任何值，包括NaN，使用object。Equals（）方法时，两个NaN相等，验证某位是否为NaN，可以使用`float.IsNaN(),double.IsNaN()`  
 float and double 是基于2来表示数值的，只有可用2表达的数值才是精准的，大多数带有小数的literal都不会被精确表达出来  
-- char  
+- **char**  
 System.Char  
 占两个字符，用`'x'`表示 
 转意字符`\\`  
-- string  
-逐字字符串使用`@`符号加在字符串前，如`string a = @"\\hello";`
+- **string**  
+逐字字符串使用`@`符号加在字符串前，如`string a = @"\\hello";` 
+string 有加法方法，可以将两个字符串连接起来，如果一个不是字符串就会调用它的ToString方法，大两室用+做字符串连接的效率很低，最好使用StringBuilder  
+**字符串插值string interpolation**可以在字符串中插入值，如：  
+    ```C#
+    inyt x-4;Console.WriteLines($"A aquare has {x} sides");
+    ```
+    任何C#表达式都可以出现在{}内，会调用Tostring或者其等效方法。默认只支持单行，多行则需要在$符号前加@如`string a = @$"ohh";  
+    string不支持<>等比较操作，需要使用CompareTo方法，
+- **数组**  
+ 继承于System.Array类  
+ 声明数组  
+    ```C#
+    char[] vowels = new char[5];
+    char[] vowels= {'a', 'b'}; 
+    var vowels = new[] {'a', 'b'};//会隐式转换
+    System.Console。WriteLine（vowels.GetType());
+    ```  
+
+    数组的长度为vowels.Length属性  
+    一旦数组被创建，那么长度就是不可改变的,没有赋值会被赋予默认值  
+    如果存的是引用类型则会被默认赋值为Null  
+    **矩形数组**  
+    `int[,] matrix = new int[3,3];`使用GetLength(维度)方法可以返回指定维度的长度，GetLength（0）表示第一维。  
+    二维数组初始化可以使用：
+    ```C#
+    int[,] matrix2 = new int [,]
+    {
+        {0,1,2},
+        {3,4,5},
+        {6,7,8}
+    };
+    ```
+    **交错数组**  
+    `int [][] matrix = new int[3][];`  
+    内层维度并没有具体指明，可以是任意维度。  
+    ```C#
+    int [][] matrix = new int [3][];
+    for(int i = 0; i< matrix.Length; i++>)
+    {
+        matrix[i] = new int[i+3];
+        for(int j = 0; j < matrix[i].Length; j++)
+        {
+            //todo
+        }
+    }
+    ```  
+    unsafe关键字可以绕过边界检查  
+- **Stack和Heap**  
+Stack存储本地变量和参数，随着函数的进入和退出，Stack也会随之增大和缩小  
+Heap是对象（引用类型的实例）所在的地方，一旦某个对象不再被任何存活的东西所引用，那么它就可以被gc释放了。   
+static字段在heap上，会存活到应用程序停止。  
+除非使用Unsafe否则C#里无法访问未初始化的内容。  
+可以通过default来获得任何类型的默认关键值。  
+- **参数**  
+按值传送，默认都是按值传递的。相当于复制了一份。  
+按值传递引用类型的实参，复制的是引用不是对象。  
+按引用传递，使用ref关键字。与cpp中的引用一致，在使用前必须被赋值.。  
+    ```C#
+    static void foo(ref int p)
+    {
+        ///
+    }
+    //when you us foo
+    foo(ref x);
+    ```
+    无论是引用类型还是值类型，都可以使用按值或者按引用传递。  
+out 关键字在进入函数前不需要被赋值，但是在离开函数前必须被赋值，常常用于从方法中返回多个值。从C#7开始，可以在嗲用方法时使用out声明临时变量，
+    ```C#
+    myfunc("hello",out string a, out string b);//no need to declare a and b in a line
+    write(a);
+    myfunc2("hello", out string a, out _);//使用下划线表示我们不需要这个返回值，弃用discard
+    ```
+    params修饰符  
+    在方法的最后一个参数使用params修饰符，可以接受任意数量的该类型参数
+    ```C#
+    static int Sum(params int[] ints)
+    {
+        //
+    }
+    static void Main()
+    {
+        int total = Sum(1,2,3,4,5);//use
+        // int total = Sum(new int[] {1,2,3,4,5}); 
+    }
+    ```  
+    可选参数  
+    从C#4开始，方法，构造函数，索引器都可以声明可选参数，可选参数需要在声明时提供默认值，调用时可以不填写可选的参数。必填参数必须在可选参数前面，params修饰的参数还是放在最后面  
+    **命名参数**  
+    在调用时可以不按照参数顺序传入  
+    ```C#
+    void Foo(int x, int y)
+    {
+        //
+    }
+    int b=0;
+    void Foo2()
+    {
+        Foo1(x: 1, y: 2);
+        Foo1(y: 2, x: 1);
+        Foo1(y: --b, x: ++b);//Foo(1,-1);
+    }
+    ```  
+    ref locals  
+    ```C#  
+    int[] numbers = {1,2,3,4};
+    ref int numRef = ref numbers[2];//配合ref return 使用，ref return可以从方法返回ref local
+    static String x = "hello";
+    static ref String GetX() => ref x;//相当于return ref x;
+    public static void Main() {
+        ref String xRef = ref GetX();
+        xRef = "new";
+        Console.WriteLine(x);
+    ```
+- 处理输入  
+    ```C#
+    string[] input = Console.ReadLine().Split(' ');
+    ```

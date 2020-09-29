@@ -37,7 +37,7 @@ typeid(a_rb).name()；  // 由于a_rb是多态类型的glvalue，typeid在运行
 
 - 快排的基本格式
     ```cpp
-    while(front<rear>){
+    while(front<rear){
         int mid = (front+rear)>>1;
         if(k[mid]<target){
             front= mid+1;
@@ -46,7 +46,28 @@ typeid(a_rb).name()；  // 由于a_rb是多态类型的glvalue，typeid在运行
     }
     return front;
     ```
-    需要注意的是
+    需要注意的是  
+     ```cpp
+        void mysort(vector<int> &a, int l,int r)//自己写的快排 
+    {
+        int mid=a[(l+r)/2];//找中间的数进行2分 
+        int i=l,j=r;
+        while(i<j){
+            while(a[i]<mid)
+            i++;//找左半部分大于中间数的 
+            while(a[j]>mid)
+            j--;//找右半部分小于中间数的 
+            if(i<=j)
+            {
+                swap(a[i],a[j]);//换位 
+                i++;//左指针右移 
+                j--;//右指针左移 
+            }
+        }
+        if(l<j) mysort(a,l,j);
+        if(i<r) mysort(a,i,r);
+    }
+```
 
 - 容器的emplace插入  
     普通的push和insert操作都是传递元素类型对象本身，而emplace_front()和emplace_back()将参数传递给元素类型的构造函数，如：
