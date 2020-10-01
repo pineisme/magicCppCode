@@ -241,4 +241,68 @@ out 关键字在进入函数前不需要被赋值，但是在离开函数前必�
 - 处理输入  
     ```C#
     string[] input = Console.ReadLine().Split(' ');
+    ```  
+- **null操作符**  
+`??`操作符,意味着如果操作数不是null，则把它给我，否则给我一个默认值，如果左边的表达式非null，那么??右边的表达式就不会被计算。  
+    ```C#
+    string s1 = null;
+    string s2 = s1 ?? "hello";//s2=hello  
     ```
+    null条件操作符（elvis)`?.`  
+    ```C#
+    System.Text.StringBuilder sb = null;
+    string s1 = sb.ToString();//sb是null的话会抛出异常
+    string s = sb?.ToString();//不会抛出异常，等于下面这句话
+    string s = (sb == null ? null : sb.ToString());
+    ```
+    最终的表达式必须为可以接受null，如：  
+    ```C#
+    int length = sb?.ToString().Length;//错误，因为int不能被置为null  
+    int? length = sb?.ToString().Length;//正确，转为可空值类型。
+    ```
+- ***语句***  
+object类是C#中所有对象的父类，可以存入任何类型。  
+switch的特殊用法：  
+    ```C# 
+        static void TellMeTheType(object x)
+        {
+            switch(x)
+            {
+                case int i:
+                    Console.WriteLine("it is a int");
+                    Console.WriteLine($"The square of {i} is {i*i});
+                    break;
+                case string s:
+                //
+                drefault:
+                    Console.WriteLine();
+                    break;
+            }
+        }
+        //case bool b when b == true:
+            //
+            break;
+    ```
+    case null://可以的写法  
+    foreach可以迭代enumerable（可枚举）的对象  
+    ```C#
+    foreach(char c in "Bear" )
+    {
+        Consloe.WriteLine(c);
+    }
+    ```
+    **跳转语句**  
+    跳转语句准寻try语句的可靠性原则，即为在跳出try块时，在到达跳转目标之前，总会先执行try的finally块，不可以从finally块里面调准到外面,除了throw  
+    goto语句，吧执行跳转到另一个label的语句块  
+    goto label;  
+    ```C#
+    startLoop:
+        if（ i<= 5）{
+            Console。Write（）；
+            i++;
+            goto startloop;
+        }
+    ```  
+    throw语句，抛出异常  
+    
+    
